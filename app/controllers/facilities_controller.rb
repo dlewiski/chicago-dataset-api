@@ -1,8 +1,8 @@
 class FacilitiesController < ApplicationController
 
-  TOKEN = "secret"
+  before_action :restrict_access
 
-  before_action :authenticate, except: [ :index ]
+  # before_action :authenticate, except: [ :index ]
 
   def index
     @facilities = Facility.all
@@ -34,11 +34,21 @@ class FacilitiesController < ApplicationController
     params.permit(:dba_name, :aka_name)
   end
 
-  def authenticate
+  def restrict_access
     authenticate_or_request_with_http_token do |token, options|
-      # Compare the tokens in a time-constant manner, to mitigate
-      # timing attacks.
-      ActiveSupport::SecurityUtils.secure_compare(token, TOKEN)
+      ApiKey.exists?(access_token: token)
     end
   end
+
+  # def authenticate
+  #   authenticate_or_request_with_http_token do |token, options|
+  #     # Compare the tokens in a time-constant manner, to mitigate
+  #     # timing attacks.
+  #     ActiveSupport::SecurityUtils.secure_compare(token, TOKEN)
+  #   end
+  # end
+  # def restrict_access
+  #   api_key = ApiKey.find_by_access_token(params[:access_token])
+  #   head :unauthorized unless api_key
+  # end
 end
