@@ -5,7 +5,7 @@ class FacilitiesController < ApplicationController
   # before_action :authenticate, except: [ :index ]
 
   def index
-    @facilities = Facility.all
+    @facilities = Facility.paginate(:page => params[:page], :per_page => 5)
     json_response(@facilities)
   end
 
